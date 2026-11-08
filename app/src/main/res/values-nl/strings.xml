@@ -32,7 +32,7 @@
     <string name="setting_use_usage_access_desc">In plaats van toegankelijkheid (Freeze, App Lock, Dynamic Nacht Licht)</string>
     <!-- Button Remap -->
     <string name="button_remap_enable_title">Opnieuw toewijzen van fysieke knoppen inschakelen</string>
-    <string name="button_remap_use_shizuku_title">Use Shizuku</string>
+    <string name="button_remap_use_shizuku_title">Gebruik Shizuku</string>
     <string name="button_remap_use_shizuku_desc">Werkt met uitgeschakeld scherm (Aanbevolen)</string>
     <string name="shizuku_not_running_toast">Shizuku loopt niet</string>
     <string name="shizuku_detected_prefix">Gedetecteerd %1$s</string>
@@ -70,7 +70,7 @@
     <string name="essentials_on_display_docked_mode_desc">Houd de overlay op het AOD oneindig aan tijdens het spelen van muziek</string>
     <string name="essentials_on_display_respect_notifications_title">Houd rekening met nieuwe meldingen</string>
     <string name="essentials_on_display_respect_notifications_desc">Zet kort uit voor nieuwe meldingen</string>
-    <string name="essentials_on_display_random_shapes_title">Random shapes</string>
+    <string name="essentials_on_display_random_shapes_title">Willekeurige vormen</string>
     <string name="essentials_on_display_random_shapes_desc">Use various Material 3 shapes for the album art</string>
     <string name="essentials_on_display_album_art_title">Album art</string>
     <string name="essentials_on_display_clock_title">Clock</string>
@@ -177,7 +177,7 @@
     <string name="flashlight_pulse_title">Zaklamppuls</string>
     <string name="flashlight_pulse_facedown_title">Alleen als het apparaat met het scherm naar beneden ligt</string>
     <string name="flashlight_pulse_same_as_lighting_title">Dezelfde apps als de meldingsverlichting</string>
-    <string name="flashlight_pulse_max_brightness">Max brightness</string>
+    <string name="flashlight_pulse_max_brightness">Max helderheid</string>
     <string name="flashlight_pulse_preview">Preview pulse</string>
     <string name="settings_section_style">Stijl</string>
     <string name="notification_lighting_stroke_adjustment_section">Lijn aanpassen</string>
@@ -1735,4 +1735,27 @@
     <string name="island_statusbar_aware_width_title">Statusbar aware width</string>
     <string name="debug_ui_margin_overlay_title">Debug UI margin overlay</string>
     <string name="island_statusbar_ignore_notifications_title">Ignore notifications</string>
+    <string name="notification_lighting_ripple_sparkle_title">Sprankel</string>
+    <string name="notification_lighting_sweep_select_shapes_title">Kies Vormen</string>
+    <string name="notification_lighting_sweep_select_shapes_desc">Kies welke vormen worden gebruikt in de animatie</string>
+    <string name="notification_lighting_ripple_sparkle_count_title">Sprankel hoeveelheid</string>
+    <string name="notification_lighting_ripple_sparkle_size_title">Sprankel grootte </string>
+    <string name="flashlight_speed_label">Snelheid</string>
+    <string name="notification_lighting_ripple_repeat_count_title">Herhaling</string>
+    <string name="notification_lighting_pulse_overlap_title">Puls overlap</string>
+    <string name="notification_lighting_ripple_wave_size_title">Golf grootte</string>
+    <string name="feat_aod_wallpaper_opacity">Zichtbaarheid</string>
+    <string name="flashlight_pulse_disable_on_dnd_title">Ga niet aan bij Niet Storen-modus</string>
+    <string name="label_snooze_default">Standaard snooze duur</string>
+    <string name="label_snooze_option_1">Optie 1</string>
+    <string name="label_snooze_option_2">Optie 2</string>
+    <string name="label_snooze_option_3">Optie 3</string>
+    <string name="label_snooze_option_4">Optie 4</string>
+    <string name="sound_mode_use_shizuku_desc">Gebruik Shizuku om een geluidsniveau aan te zetten zonder Niet Storen te activeren</string>
+    <string name="feat_volume_steps_title">Volume stappen</string>
+    <string name="feat_volume_steps_desc">Verander hoeveel het volume verandert bij een toetsdruk</string>
+    <string name="volume_steps_per_press_title">Stappen per druk</string>
+    <string name="feat_app_volume_desc">Stel een apart volumeniveau in voor elke app</string>
+    <string name="app_volume_add_app">Voeg app toe</string>
+    <string name="app_volume_add_app_desc">Zet het volume voorat een app begint met afspelen</string>
 </resources>
