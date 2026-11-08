@@ -1826,4 +1826,5 @@ adicionar algum app</string>
     <string name="island_media_player_style_title">Player style</string>
     <string name="debug_ui_margin_overlay_title">Debug UI margin overlay</string>
     <string name="island_statusbar_ignore_notifications_title">Ignore notifications</string>
+    <string name="widget_stack_interval_seconds">Notifique-nos sobre novas atualizações. </string>
 </resources>
