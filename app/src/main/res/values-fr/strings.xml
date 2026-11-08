@@ -1394,7 +1394,7 @@ Réinitialiser permet d\'effacer les valeurs personnalisées et le système gér
     <string name="about_desc_live_wallpaper">Set your favorite video as your home screen wallpaper. Choose between triggering the animation upon unlocking or simply whenever the screen turns on for a dynamic experience.</string>
     <!-- Shut-Up! Feature -->
     <string name="feat_shut_up_title">Tais toi !</string>
-    <string name="feat_shut_up_desc">Je sais ce que je fait</string>
+    <string name="feat_shut_up_desc">Je sais ce que je fais</string>
     <string name="shut_up_description">Shut-Up! bypasses app restrictions and checks for developer options, accessibility and debugging by dynamically hiding them when you launch sensitive apps. \n\nUse the custom shortcuts to ensure settings are hidden before the app launches.</string>
     <string name="shut_up_select_apps_title">Sélectionner les applications</string>
     <string name="shut_up_select_apps_desc">Sélectionner les apps auxquelles appliquer Tais-toi !</string>
@@ -1686,7 +1686,7 @@ Note que en activant ça peut casser les widgets At a Glance du launcher (Comme 
     <string name="label_battery_section_specs">Spécifications</string>
     <string name="label_auto_reset_battery_stats_title">Réinitialisation automatique</string>
     <string name="label_auto_reset_battery_stats_desc">Réinitialise automatiquement les statistiques de la batterie quand l\'appareil est débranché au dessus de % c de charge.</string>
-    <string name="flashlight_pulse_disable_on_dnd_title">Ne pas activer lorsqu\'en mode Ne pas déranger.</string>
+    <string name="flashlight_pulse_disable_on_dnd_title">Ne pas déclencher en mode Ne pas déranger.</string>
     <string name="hilight_notifications_desc">Allumer la LED avec un effet différent pour chaque application</string>
     <string name="hilight_only_screen_off_title">Activer seulement lorsque l\'écran est éteint.</string>
     <string name="hilight_cooldown_title">Délai </string>
@@ -1796,4 +1796,8 @@ Les effets de la LED HiLight peuvent être aussi utilisés comme une action dans
     <string name="qs_secure_sensitive_tiles_desc">Demande de déverrouillage avant d\'activer des raccourcis rapides sensibles en mode verrouillé</string>
     <string name="feat_screenshots_title">Nettoyage des screenshots</string>
     <string name="feat_screenshots_desc">Nettoyer les screenshots partagés et anciens</string>
+    <string name="batteries_notification_title">Notification de batterie</string>
+    <string name="hilight_cooldown_desc">Attendre ce délai avant de s\'allumer à nouveau pour la même appli</string>
+    <string name="hilight_repeats_title">Répéter</string>
+    <string name="duo_action_horizontal_slide_brightness">Luminosité</string>
 </resources>
