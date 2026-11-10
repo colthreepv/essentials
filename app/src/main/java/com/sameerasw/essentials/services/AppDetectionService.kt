@@ -13,7 +13,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
-import android.app.usage.UsageStats
+import android.app.usage.UsageEvents
 import android.app.usage.UsageStatsManager
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -34,6 +34,8 @@ class AppDetectionService : Service() {
     private val handler = Handler(Looper.getMainLooper())
     private var isPolling = false
     private var lastPackageName: String? = null
+    private var lastUsageEventQuery = System.currentTimeMillis() - 86_400_000L
+    private val foregroundEvents = ForegroundEventTracker()
 
     companion object {
         private const val CHANNEL_ID = "app_detection_service_channel"
@@ -135,39 +137,47 @@ class AppDetectionService : Service() {
                 override fun run() {
                     if (!isPolling) return
 
-                    val currentPackage = getForegroundPackage()
-                    if (currentPackage != null && currentPackage != lastPackageName) {
-                        lastPackageName = currentPackage
-                        appFlowHandler.onPackageChanged(currentPackage, isFromUsageStats = true)
+                    try {
+                        pollForegroundChanges()
+                    } catch (e: RuntimeException) {
+                        Log.e("AppDetectionService", "Unable to read foreground events; retrying", e)
+                    } finally {
+                        handler.postDelayed(this, POLL_INTERVAL)
                     }
-
-                    handler.postDelayed(this, POLL_INTERVAL)
                 }
             },
             POLL_INTERVAL,
         )
     }
 
-    private fun getForegroundPackage(): String? {
+    private fun pollForegroundChanges() {
         val usageStatsManager = getSystemService(USAGE_STATS_SERVICE) as UsageStatsManager
         val time = System.currentTimeMillis()
-        val stats =
-            usageStatsManager.queryUsageStats(
-                UsageStatsManager.INTERVAL_DAILY,
-                time - 1000 * 10,
-                time,
-            )
-
-        if (stats == null || stats.isEmpty()) return null
-
-        var recentStats: UsageStats? = null
-        for (usageStats in stats) {
-            if (recentStats == null || usageStats.lastTimeUsed > recentStats.lastTimeUsed) {
-                recentStats = usageStats
-            }
+        // A wall-clock correction must not leave the query interval in the future.
+        if (time < lastUsageEventQuery) {
+            foregroundEvents.reset()
+            lastUsageEventQuery = time - 86_400_000L
         }
-
-        return recentStats?.packageName
+        // A short overlap admits events published after their timestamp. Older
+        // late arrivals cannot replace a newer resumed activity in the tracker.
+        val start = lastUsageEventQuery - 5_000L
+        val events = usageStatsManager.queryEvents(start, time) ?: return
+        val event = UsageEvents.Event()
+        while (events.hasNextEvent()) {
+            events.getNextEvent(event)
+            if (event.eventType != UsageEvents.Event.ACTIVITY_RESUMED) continue
+            val packageName = event.packageName ?: continue
+            foregroundEvents.resumed(packageName, event.timeStamp)
+        }
+        // Notify only the final foreground state. Replaying startup history can
+        // fire app locks or restore settings for an app already reopened.
+        val currentPackage = foregroundEvents.packageName
+        if (currentPackage != null && currentPackage != lastPackageName) {
+            appFlowHandler.onPackageChanged(currentPackage, isFromUsageStats = true)
+            lastPackageName = currentPackage
+        }
+        appFlowHandler.reconcileShutUpSettings()
+        lastUsageEventQuery = time
     }
 
     private fun goHome() {

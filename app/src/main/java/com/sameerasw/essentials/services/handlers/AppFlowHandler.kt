@@ -38,6 +38,7 @@ import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.utils.ShizukuUtils.toggleShizuku
 import com.sameerasw.essentials.utils.StatusBarManager
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -56,6 +57,8 @@ class AppFlowHandler(
     private var appLockLeftAt = 0L
     private val lastLeaveTimes = mutableMapOf<String, Long>()
     private val activeCountdowns = mutableMapOf<String, Job>()
+    private var pendingShutUpRestore: Job? = null
+    private var reconciledShutUpBackup: Map<String, String>? = null
     private val settingsRepository by lazy { SettingsRepository(context) }
     private val backGestureDispatcher = Dispatchers.IO.limitedParallelism(1)
     private var backGestureConfigs: Map<String, BackGestureAppConfig>? = null
@@ -631,6 +634,23 @@ class AppFlowHandler(
         return launchers.any { it.activityInfo.packageName == packageName }
     }
 
+    /** Recover saved settings even when the service missed the protected app's visit. */
+    fun reconcileShutUpSettings() {
+        val backup = settingsRepository.getShutUpOriginalSettings()
+        if (backup.isEmpty()) {
+            reconciledShutUpBackup = null
+            return
+        }
+        val foreground = currentPackage ?: return
+        if (settingsRepository.loadShutUpConfigs().any { it.isEnabled && it.packageName == foreground }) {
+            reconciledShutUpBackup = null
+            return
+        }
+        if (pendingShutUpRestore?.isActive == true || reconciledShutUpBackup == backup) return
+        reconciledShutUpBackup = backup
+        restoreShutUpSettings(settingsRepository, null)
+    }
+
     private fun checkShutUpRestore(
         oldPackage: String?,
         newPackage: String?,
@@ -658,11 +678,10 @@ class AppFlowHandler(
             "checkShutUpRestore: wasShutUpConfig=${wasShutUpConfig != null}, isNewAppShutUp=$isNewAppShutUp, isAlreadyFrozen=$isAlreadyFrozen",
         )
 
-        // If it's already frozen, we've already handled it
-        if (isAlreadyFrozen) return
-
         // If we are entering a Shut-Up app, cancel ANY pending countdowns for other apps
         if (isNewAppShutUp) {
+            pendingShutUpRestore?.cancel()
+            pendingShutUpRestore = null
             if (activeCountdowns.isNotEmpty()) {
                 Log.d(
                     "AppFlowHandler",
@@ -673,6 +692,9 @@ class AppFlowHandler(
                 activeCountdowns.clear()
             }
         }
+
+        // If it's already frozen, we've already handled it
+        if (isAlreadyFrozen) return
 
         if (wasShutUpConfig != null && !isNewAppShutUp) {
             Log.d("AppFlowHandler", "checkShutUpRestore: Triggering restoration for $oldPackage")
@@ -1023,6 +1045,8 @@ class AppFlowHandler(
         autoArchivePackage: String? = null,
         forceRestore: Boolean = false,
     ) {
+        pendingShutUpRestore?.cancel()
+        pendingShutUpRestore = null
         val originalSettings = repository.getShutUpOriginalSettings()
         if (originalSettings.isEmpty()) {
             if (autoArchivePackage != null) {
@@ -1031,21 +1055,20 @@ class AppFlowHandler(
             return
         }
 
-        val mode = repository.getShutUpRestoreMode()
-        if (mode == "Notify" && !forceRestore) {
-            scope.launch {
-                val delaySeconds = repository.getShutUpRestoreDelay()
-                delay((delaySeconds * 1000L).milliseconds)
-                showRestoreNotification(wasShutUpConfig, autoArchivePackage)
-            }
-            return
-        }
-
-        scope.launch {
+        val restoreJob = scope.launch(start = CoroutineStart.LAZY) {
             if (!forceRestore) {
                 // Delay to ensure the app has fully settled before restoring system settings
                 val delaySeconds = repository.getShutUpRestoreDelay()
                 delay((delaySeconds * 1000L).milliseconds)
+                if (repository.loadShutUpConfigs().any { it.isEnabled && it.packageName == currentPackage }) {
+                    pendingShutUpRestore = null
+                    return@launch
+                }
+                pendingShutUpRestore = null
+                if (repository.getShutUpRestoreMode() == "Notify") {
+                    showRestoreNotification(wasShutUpConfig, autoArchivePackage)
+                    return@launch
+                }
             }
 
             val canWriteSecure =
@@ -1114,6 +1137,8 @@ class AppFlowHandler(
                 startAutoArchiveCountdown(autoArchivePackage)
             }
         }
+        if (!forceRestore) pendingShutUpRestore = restoreJob
+        restoreJob.start()
     }
 
     companion object {

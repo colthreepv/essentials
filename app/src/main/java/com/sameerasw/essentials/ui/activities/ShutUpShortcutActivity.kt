@@ -263,7 +263,7 @@ class ShutUpShortcutActivity : ComponentActivity() {
             }
 
             if (originalSettings.isNotEmpty()) {
-                repository.saveShutUpOriginalSettings(originalSettings)
+                repository.saveShutUpOriginalSettings(originalSettings + repository.getShutUpOriginalSettings())
             }
         }
     }
